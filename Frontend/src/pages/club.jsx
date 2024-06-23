@@ -4,7 +4,7 @@ import { marketplaceAddress } from "../config";
 import {Web3} from 'web3';
 import $, { error } from 'jquery'; 
 import { useNavigate } from 'react-router-dom';
-import ABI from "../SmartContract/artifacts-zk/contracts/Investment.sol/InvestmentClub.json"
+import ABI from "../SmartContract/artifacts/contracts/InvestmentClub.sol/InvestmentClub.json"
 import { notification } from 'antd';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,7 +14,7 @@ import GetProposals from "../getProposals";
 import axios from 'axios';
 import Tg from "../components/toggle";
 const ethers = require("ethers")
-const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.era.zksync.dev"));
+const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 var contractPublic = null;
 
 var hash = null;

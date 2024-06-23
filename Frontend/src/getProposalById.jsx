@@ -6,11 +6,13 @@ import $ from 'jquery';
 import { marketplaceAddress } from "./config";
 import {Web3} from 'web3';
 
-import ABI from "./SmartContract/artifacts-zk/contracts/Investment.sol/InvestmentClub.json"
+
+
+import ABI from "./SmartContract/artifacts/contracts/InvestmentClub.sol/InvestmentClub.json"
 
 
 
-const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.era.zksync.dev"));
+const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 var contractPublic = null;
 
 var pieceCID = null;

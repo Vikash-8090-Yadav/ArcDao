@@ -9,6 +9,9 @@ import SideMenu from './Sidemenu';
 
 import { useAuth } from "@arcana/auth-react";
 
+// import { AuthProvider } from '@arcana/auth';
+// import { ArcanaProvider } from '@arcana/provider';
+
 const networks = {
   zkSyncSepoliaTestnet: {
     chainId: `0x${Number(300).toString(16)}`,
@@ -30,7 +33,22 @@ var accountAddress= localStorage.getItem("filWalletAddress");
 
 function Nav() {
 
-  const { loading, isLoggedIn, connect, user } = useAuth();
+  // const provider1 = provider.provider;
+
+
+
+  const { loading, isLoggedIn, provider,connect, user } = useAuth();
+
+  console.log("The provider is",provider);
+
+ 
+
+
+
+
+  console.log("The user is",user);
+
+  // const {address} = user;
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -43,18 +61,22 @@ function Nav() {
 
   const fetchBalance = async () => {
 
-    console.log(address)
-    let web3 = await new Web3(window.ethereum);
-    
-    const balanceWei= await web3.eth.getBalance(accountAddress)
-            
-    const finalbalance = web3.utils.fromWei(balanceWei,"ether")+ " "+networks["zkSyncSepoliaTestnet"]["nativeCurrency"]["name"];
-    console.log("result->"+finalbalance);
-    setBalance(finalbalance);
-    
+//     let from = ''
+
+// async function getAccounts() {
+//   console.log('Requesting accounts')
+//   try {
+//     const accounts = await provider.request({ method: 'eth_accounts' })
+//     console.log({ accounts })
+//     from = accounts[0] // Use this account address to get wallet balance
+//   } catch (e) {
+//     console.log({ e })
+//   }
+// }
     
   };
 
+  
   const onConnectClick = async () => {
     try {
       await connect(); // Built-in, plug & play login UI
@@ -65,42 +87,68 @@ function Nav() {
   };
   
 
-  const handleLogin = async () => {
-    setLoading(true);
-    
-    if(typeof window.ethereum =="undefined"){
-      console.log("PLease install the metamask");
-  }
-  let web3 =  new Web3(window.ethereum);
- 
-  if(web3.network !=="Kura"){
-      await window.ethereum.request({
-          method:"wallet_addEthereumChain",
-          params:[{
-              ...networks["zkSyncSepoliaTestnet"]
-          }]
-      })
-  }
-  const accounts = await web3.eth.requestAccounts();
-  const Address =  accounts[0];
-  localStorage.setItem("filWalletAddress",Address)
 
-  console.log(Address)
-  setAddress(Address);
-
-    setLoading(false);
-    window.location.reload();
-  };
 
 
   
-  function logout(){
+  async function logout(){
     alert("Logout")
-    localStorage.clear();
-    window.location.reload();
+    const accounts = await  provider.request({ method: 'eth_accounts' })
+
+    console.log("The account is",accounts[0]);
+
+
+    console.log("This is under Logout")
+
+  
+    try {
+      // const auth = new AuthProvider('your-app-id'); // Initialize AuthProvider with your app ID
+      // await auth.init();
+  
+      // const provider = new ArcanaProvider(auth); // Create Arcana provider
+  
+      // Convert message to hexadecimal format
+      // const hexMessage = `0x${Buffer.from(message, 'utf8').toString('hex')}`;.
+
+      console.log(provider);
+  
+      const sig = await provider.request({
+        method: 'eth_sign',
+        params: [accounts[0],'Thhiiss'],
+      });
+      
+      console.log({ sig });
+    } catch (error) {
+      console.error('Error signing message:', error);
+    }
+  
+    // localStorage.clear();
+    // window.location.reload();
     // Logout();
   }
 
+  useEffect(() => {
+
+
+    async function test(){
+      try{
+
+        if(user){
+  
+          const add = user.address;
+  
+          console.log("The adress under useeffectr is ",add);
+          localStorage.setItem("filWalletAddress",add) 
+        }
+  
+      }catch(e){
+  
+      }
+    }
+
+    test();
+  
+  }, []);
 
   console.log(accountAddress)
 

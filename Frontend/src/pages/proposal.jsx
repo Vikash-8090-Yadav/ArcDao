@@ -9,7 +9,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { marketplaceAddress } from "../config";
 import {Web3} from 'web3';
 import { notification } from 'antd';
-import ABI from "../SmartContract/artifacts-zk/contracts/Investment.sol/InvestmentClub.json"
+
+import ABI from "../SmartContract/artifacts/contracts/InvestmentClub.sol/InvestmentClub.json"
 
 
 import axios from 'axios';
@@ -22,7 +23,7 @@ const ethers = require("ethers")
 
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const DataDaoAddress  = "0x8138489b863a68f224307a5D0Fa630917d848e25"
-const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.era.zksync.dev"));
+const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 
 var contractPublic = null;
 

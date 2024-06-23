@@ -4,7 +4,8 @@ import Tg from "../components/toggle";
 import $ from 'jquery'; 
 import { marketplaceAddress } from "../config";
 import {Web3} from 'web3';
-import ABI from "../SmartContract/artifacts-zk/contracts/Investment.sol/InvestmentClub.json"
+
+import ABI from "../SmartContract/artifacts/contracts/InvestmentClub.sol/InvestmentClub.json"
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,7 +13,7 @@ import lighthouse from '@lighthouse-web3/sdk'
 import axios from 'axios';
 import { notification } from 'antd';
 import GetClub from "../getclub";
-const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.era.zksync.dev"));
+const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 const apiKey = "207e0c12.0ca654f5c03a4be18a3185ea63c31f81"
 var contractPublic = null;
 var cid = null;

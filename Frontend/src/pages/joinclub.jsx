@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import {Web3} from 'web3';
 
 
-const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.era.zksync.dev"));
+const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 
 function JoinClub() {
   const navigate = useNavigate();

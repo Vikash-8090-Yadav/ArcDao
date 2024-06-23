@@ -25,7 +25,7 @@ const provider = new AuthProvider(
 ReactDOM.render(
     <React.StrictMode>
       <ProvideAuth provider={provider}>
-      <Nav />
+      <Nav provider={provider}/>
     </ProvideAuth>
       <BrowserRouter>
         <Routes>

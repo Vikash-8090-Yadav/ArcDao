@@ -5,10 +5,12 @@ import club from "./pages/club";
 import { marketplaceAddress } from "./config";
 import {Web3} from 'web3';
 import $ from 'jquery'; 
-import ABI from "./SmartContract/artifacts-zk/contracts/Investment.sol/InvestmentClub.json"
 
 
-const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.era.zksync.dev"));
+import ABI from "./SmartContract/artifacts/contracts/InvestmentClub.sol/InvestmentClub.json"
+
+
+const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 var contractPublic = null;
 
 

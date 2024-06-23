@@ -11,13 +11,18 @@ import 'react-toastify/dist/ReactToastify.css';
 import { marketplaceAddress } from "../config";
 import {Web3} from 'web3';
 import $ from 'jquery'; 
-import ABI from "../SmartContract/artifacts-zk/contracts/Investment.sol/InvestmentClub.json"
+
+import { AuthProvider } from "@arcana/auth";
+import { ProvideAuth } from "@arcana/auth-react";
+
+
+import ABI from "../SmartContract/artifacts/contracts/InvestmentClub.sol/InvestmentClub.json"
 const ethers = require("ethers")
-const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.era.zksync.dev"));
+const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 
 
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
+// const provider = new ethers.providers.Web3Provider(window.ethereum);
 
 
 
@@ -27,6 +32,22 @@ var contractPublic = null;
 
 const owneraddress = localStorage.getItem("filWalletAddress");
 
+
+const provider1 = new AuthProvider(
+  "xar_test_579ae885bb13e159dcb5b7ce5c9b09ecd3898891",
+  {
+    network: "testnet",
+    theme: "light",
+    connectOptions: {
+      compact: true,
+    },
+    chainConfig: {
+      chainId: "84532"
+    }
+  }
+);
+
+const provider = provider1.provider;
 
 function CreateClub() {
 
@@ -165,17 +186,29 @@ function CreateClub() {
             const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
 
 
-            await provider.send('eth_requestAccounts', []); // <- this promps user to connect metamask
-            const signer = provider.getSigner();
+            // await provider.send('eth_requestAccounts', []); // <- this promps user to connect metamask
+            // const signer = provider.getSigner();
              
 
-              console.log("singer",signer);
+            //   console.log("singer",signer);
+
+            const { sig } = await provider.request({
+              method: 'eth_sign',
+              params: [
+                {
+                  walletAddress, // sender account address
+                  data: 'some message data',
+                },
+              ],
+            })
+            console.log({ sig })
+
               const tx = {
                 to: marketplaceAddress,
                 data: encodedData,
           
               };
-              const txResponse = await signer.sendTransaction(tx);
+              const txResponse = await sig.sendTransaction(tx);
               const txReceipt = await txResponse.wait();
 
               notification.success({
