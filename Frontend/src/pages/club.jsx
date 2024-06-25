@@ -40,6 +40,11 @@ function Club() {
 
 
   async function contributeClub() {
+    if(!isLoggedIn){
+      alert("Please Login  First!!");
+
+      return;
+    }
  
     toast.info('Contribution intiated ...', {
       position: "top-right",
@@ -161,6 +166,11 @@ function Club() {
   }
   
   async function leaveClub() {
+    if(!isLoggedIn){
+      alert("Please Login  First!!");
+
+      return;
+    }
     $('.successJoinLeaveClub').css('display','none');
     $('.errorJoinLeaveClub').css('display','none');
     var clubId = localStorage.getItem("clubId");
@@ -249,6 +259,11 @@ function Club() {
 
 
   async function joinClub() {
+    if(!isLoggedIn){
+      alert("Please Login  First!!");
+
+      return;
+    }
     $('.successJoinLeaveClub').css('display','none');
     $('.errorJoinLeaveClub').css('display','none');
     var clubId = localStorage.getItem("clubId");

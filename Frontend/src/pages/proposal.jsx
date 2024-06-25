@@ -62,6 +62,12 @@ function Proposal() {
 
 
   async function runProposal(event) {
+
+    if(!isLoggedIn){
+      alert("Please Login  First!!");
+
+      return;
+    }
   
     var filWalletAddress = localStorage.getItem("filWalletAddress");
     await getContract(filWalletAddress);
@@ -239,7 +245,11 @@ function Proposal() {
   }
   async function voteOnProposal() {
   
-  
+    if(!isLoggedIn){
+      alert("Please Login  First!!");
+
+      return;
+    }
   
   
     var filWalletAddress = localStorage.getItem("filWalletAddress");

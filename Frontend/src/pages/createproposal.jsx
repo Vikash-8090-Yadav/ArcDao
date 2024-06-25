@@ -65,6 +65,8 @@ async function Registerjob(){
 }
 function CreateProposal() {
 
+  
+
 
   const { loading, isLoggedIn,provider,connect, logout, user } = useAuth();
 
@@ -77,6 +79,14 @@ function CreateProposal() {
 
   
   async function createProposal() {
+
+    
+    if(!isLoggedIn){
+      alert("Please Login  First!!");
+
+      return;
+    }
+
     
     var walletAddress = localStorage.getItem("filWalletAddress");
     // alert(walletAddress) /// /////
