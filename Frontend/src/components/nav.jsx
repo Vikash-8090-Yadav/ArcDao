@@ -214,7 +214,7 @@ function Nav() {
   href="/"
 >
   
-  <div className=" mmh text-lg mx-3">One Dao</div>
+  <div className=" mmh text-lg mx-3">Arc Dao</div>
 </a>
 </div>
   <button
