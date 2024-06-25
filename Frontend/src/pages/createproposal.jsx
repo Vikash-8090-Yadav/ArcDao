@@ -13,6 +13,10 @@ import lighthouse from '@lighthouse-web3/sdk'
 import axios from 'axios';
 import { notification } from 'antd';
 import GetClub from "../getclub";
+
+
+import { useAuth } from "@arcana/auth-react";
+
 const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 const apiKey = "207e0c12.0ca654f5c03a4be18a3185ea63c31f81"
 var contractPublic = null;
@@ -20,7 +24,7 @@ var cid = null;
 const ethers = require("ethers")
 
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
+// const provider = new ethers.providers.Web3Provider(window.ethereum);
 async function getContract(userAddress) {
   contractPublic =  new web3.eth.Contract(ABI.abi,marketplaceAddress);
   console.log(contractPublic)
@@ -60,6 +64,9 @@ async function Registerjob(){
     });
 }
 function CreateProposal() {
+
+
+  const { loading, isLoggedIn,provider,connect, logout, user } = useAuth();
 
 
   const [Password, setPassword] = useState('');
@@ -166,25 +173,35 @@ function CreateProposal() {
                 const encodedData = iface.encodeFunctionData("createProposal", [clubId,proposal_amount, proposal_address, proposal_description,cid]);
                 const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
             
-                const signer = provider.getSigner();
-    
-                  console.log("singer",signer);
-                  const tx = {
-                    to: marketplaceAddress,
-                    data: encodedData,
-                  };
-                  const txResponse = await signer.sendTransaction(tx);
-                  const txReceipt = await txResponse.wait();
-    
-                  notification.success({
-                    message: 'Transaction Successful',
-                    description: (
-                      <div>
-                        Transaction Hash: <a href={`https://testnet.crossvaluescan.com/tx/${txReceipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{txReceipt.transactionHash}</a>
-                      </div>
-                    )
-                  });
-                  console.log(txReceipt.transactionHash);
+                const accounts = await  provider.request({ method: 'eth_accounts' })
+
+
+
+
+
+                const tx = {
+      from: accounts[0], // Adding the 'from' field
+      to: marketplaceAddress,
+      data: encodedData,
+      gas: '2000000', 
+    };
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+    // const receipt = await provider.waitForTransaction(txHash);
+    //           // const txResponse = await provider.sendTransaction(tx);
+    //           // const txReceipt = await txResponse.wait();
+
+    //           notification.success({
+    //             message: 'Transaction Successful',
+    //             description: (
+    //               <div>
+    //                Transaction Hash: <a href={`https://sepolia.basescan.org/tx/${receipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{receipt.transactionHash}</a>
+    //               </div>
+    //             )
+    //           });
+                  
               } catch (error) {
                 toast.error(error)
                 $('#errorCreateProposal').css("display","block");

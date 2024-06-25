@@ -12,9 +12,7 @@ import { marketplaceAddress } from "../config";
 import {Web3} from 'web3';
 import $ from 'jquery'; 
 
-import { AuthProvider } from "@arcana/auth";
-import { ProvideAuth } from "@arcana/auth-react";
-
+import { useAuth } from "@arcana/auth-react";
 
 import ABI from "../SmartContract/artifacts/contracts/InvestmentClub.sol/InvestmentClub.json"
 const ethers = require("ethers")
@@ -33,26 +31,35 @@ var contractPublic = null;
 const owneraddress = localStorage.getItem("filWalletAddress");
 
 
-const provider1 = new AuthProvider(
-  "xar_test_579ae885bb13e159dcb5b7ce5c9b09ecd3898891",
-  {
-    network: "testnet",
-    theme: "light",
-    connectOptions: {
-      compact: true,
-    },
-    chainConfig: {
-      chainId: "84532"
-    }
+const typedData = {
+  types: {
+    EIP712Domain: [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' }
+    ],
+    Message: [
+      { name: 'message', type: 'string' }
+    ]
+  },
+  primaryType: 'Message',
+  domain: {
+    name: 'Example DApp',
+    version: '1.0',
+    chainId: 84532,
+    verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
+  },
+  message: {
+    message: 'This is  ArcDao'
   }
-);
+};
 
-const provider = provider1.provider;
 
 function CreateClub() {
 
   
-  
+  const { loading, isLoggedIn,provider,connect, logout, user } = useAuth();
  
   const [clubName, setClubName] = useState('');
   const [password, setPassword] = useState('');
@@ -186,40 +193,35 @@ function CreateClub() {
             const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
 
 
-            // await provider.send('eth_requestAccounts', []); // <- this promps user to connect metamask
-            // const signer = provider.getSigner();
-             
+            const accounts = await  provider.request({ method: 'eth_accounts' })
 
-            //   console.log("singer",signer);
 
-            const { sig } = await provider.request({
-              method: 'eth_sign',
-              params: [
-                {
-                  walletAddress, // sender account address
-                  data: 'some message data',
-                },
-              ],
-            })
-            console.log({ sig })
 
-              const tx = {
-                to: marketplaceAddress,
-                data: encodedData,
-          
-              };
-              const txResponse = await sig.sendTransaction(tx);
-              const txReceipt = await txResponse.wait();
 
-              notification.success({
-                message: 'Transaction Successful',
-                description: (
-                  <div>
-                   Transaction Hash: <a href={`https://testnet.crossvaluescan.com/tx/${txReceipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{txReceipt.transactionHash}</a>
-                  </div>
-                )
-              });
-              console.log(txReceipt.transactionHash);
+
+                const tx = {
+      from: accounts[0], // Adding the 'from' field
+      to: marketplaceAddress,
+      data: encodedData,
+      gas: '2000000', // Adjust gas limit if necessary
+    };
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+    // const receipt = await provider.waitForTransaction(txHash);
+    //           // const txResponse = await provider.sendTransaction(tx);
+    //           // const txReceipt = await txResponse.wait();
+
+    //           notification.success({
+    //             message: 'Transaction Successful',
+    //             description: (
+    //               <div>
+    //                Transaction Hash: <a href={`https://sepolia.basescan.org/tx/${receipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{receipt.transactionHash}</a>
+    //               </div>
+    //             )
+    //           });
+              // console.log(txReceipt.transactionHash);
 
 
    

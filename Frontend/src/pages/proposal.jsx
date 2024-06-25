@@ -18,10 +18,14 @@ import getProposalById from '../getProposalById';
 import GetClub from '../getclub';
 import Tg from "../components/toggle";
 
+
+import { useAuth } from "@arcana/auth-react";
+
+
 const ethers = require("ethers")
 
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
+// const provider = new ethers.providers.Web3Provider(window.ethereum);
 const DataDaoAddress  = "0x8138489b863a68f224307a5D0Fa630917d848e25"
 const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 
@@ -42,315 +46,11 @@ async function getContract(userAddress) {
 
 
 
-async function runProposal(event) {
-  
-  var filWalletAddress = localStorage.getItem("filWalletAddress");
-  await getContract(filWalletAddress);
-  if(contractPublic != undefined) {
-    var option_execution = $('#option_execution').val()
-    var password = $('#passwordShowPVExecution').val();
-    if(option_execution == '') {
-      $('.errorExecution').css("display","block");
-      $('.errorExecution').text("Option is required");
-      return;
-    }
-    if(password == '') {
-      $('.errorExecution').css("display","block");
-      $('.errorExecution').text("Password is invalid");
-      return;
-    }
-    var clubId = localStorage.getItem("clubId");
-    var proposalId = localStorage.getItem("proposalId");
-    try {
-      const my_wallet = await web3.eth.accounts.wallet.load(password);
-    
-    if(my_wallet !== undefined)
-    {
-      
 
-      $('.errorExecution').css("display","none");
-      $('.successExecution').css("display","block");
-      $('.successExecution').text("Running...");
-      var clubId = localStorage.getItem("clubId");
-      var proposalId = localStorage.getItem("proposalId");
-      
-        try {
-          const ans  = await contractPublic.methods.isVotingOn(clubId,proposalId).call();
-
-          if(ans){
-            toast.error("Voting is still ON")
-            $('.successExecution').css("display","none");
-            $('.errorExecution').css("display","block");
-            $('.errorExecution').text("Voting is still ON");
-          }
-          
-          if(option_execution == 'execute') {
-            const query = await contractPublic.methods.executeProposal(clubId,proposalId);
-            const encodedABI = query.encodeABI();
-            
-            
-            try{
-              const abi = ABI.abi;
-                const iface = new ethers.utils.Interface(abi);
-                const encodedData = iface.encodeFunctionData("executeProposal", [clubId,proposalId]);
-                const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
-            
-                const signer = provider.getSigner();
-
-                console.log("singer",signer);
-                const tx = {
-                  to: marketplaceAddress,
-                  data: encodedData,
-                };
-                const txResponse = await signer.sendTransaction(tx);
-                const txReceipt = await txResponse.wait();
-  
-                notification.success({
-                  message: 'Transaction Successful',
-                  description: (
-                    <div>
-                      Transaction Hash: <a href={`https://testnet.crossvaluescan.com/tx/${txReceipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{txReceipt.transactionHash}</a>
-                    </div>
-                  )
-                });
-  
-                console.log(txReceipt.transactionHash);
-            
-                
-              }catch(error){
-                console.log(error)
-              }
-
-           
-          } else {
-            if(option_execution == 'close') {
-              const query = contractPublic.methods.closeProposal(clubId,proposalId);
-              const encodedABI = query.encodeABI();
-              const ans  = await contractPublic.methods.isVotingOn(clubId,proposalId).call();
-
-              if(ans){
-                toast.error("Voting is still ON")
-                $('.successExecution').css("display","none");
-            $('.errorExecution').css("display","block");
-            $('.errorExecution').text("Voting is still ON");
-            return;
-
-              }
-              
-            try{
-               
-                
-              const abi = ABI.abi;
-                const iface = new ethers.utils.Interface(abi);
-                const encodedData = iface.encodeFunctionData("closeProposal", [clubId,proposalId]);
-                const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
-            
-                const signer = provider.getSigner();
-
-            console.log("singer",signer);
-            const tx = {
-              to: marketplaceAddress,
-              data: encodedData,
-            };
-            const txResponse = await signer.sendTransaction(tx);
-            const txReceipt = await txResponse.wait();
-
-            notification.success({
-              message: 'Transaction Successful',
-              description: (
-                <div>
-                  Transaction Hash: <a href={`https://testnet.crossvaluescan.com/tx/${txReceipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{txReceipt.transactionHash}</a>
-                </div>
-              )
-            });
-
-            console.log(txReceipt.transactionHash);
-              }catch(error){
-                console.log(error)
-              }
-            }
-          }
-          
-        } catch (error) {
-          // alert(error)
-         
-          console.log(error)
-          $('.successExecution').css("display","none");
-          $('.errorExecution').css("display","block");
-          $('.errorExecution').text("Error executing/closing the proposal");
-          return;
-        }
-        
-        $('#option_execution').val('');
-        $('#passwordShowPVExecution').val('');
-        $('.errorExecution').css("display","none");
-        $('.successExecution').css("display","block");
-        $('.successExecution').text("The execution was successful ");
-      } else {
-        // alert(error)
-        toast.error(error)
-        $('.valid-feedback').css('display','none');
-          $('.invalid-feedback').css('display','block');
-          $('.invalid-feedback').text('The password is invalid');
-      }
-    }
-    catch {
-    
-      $('.valid-feedback').css('display','none');
-          $('.invalid-feedback').css('display','block');
-          $('.invalid-feedback').text('The password is invalid');
-    }
-    
-    
-  }
-}
-
-async function verify(){
-  const clubId =  localStorage.getItem("clubId");
-  var proposalId = localStorage.getItem("proposalId");
-  var clubs = await contractPublic.methods.getProposalsByClub(clubId).call();
-  console.log(clubs)
-  const cid= clubs[proposalId-1].Cid;
-
-  const polygonScanlink = `https://gateway.lighthouse.storage/ipfs/${cid}`
-            toast.success(<a target="_blank" href={polygonScanlink}>Click to view Data</a>, {
-              position: "top-right",
-              autoClose: 18000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "dark",
-              });
-        
-
-}
-async function voteOnProposal() {
-
-
-
-
-  var filWalletAddress = localStorage.getItem("filWalletAddress");
-  await getContract(filWalletAddress);
-  
-
-  var clubId = localStorage.getItem("clubId");
-  var proposalId = localStorage.getItem("proposalId");
- 
-
-  if(contractPublic != undefined) {
-    var option_vote = $('#option_vote').val()
-    var password = $('#passwordShowPVVote').val();
-    if(option_vote == '') {
-      $('#errorCreateProposal').css("display","block");
-      $('#errorCreateProposal').text("Vote is required");
-      return;
-    }
-    if(password == '') {
-      $('#errorCreateProposal').css("display","block");
-      $('#errorCreateProposal').text("Password is invalid");
-      return;
-    }
-   
-    const my_wallet = await web3.eth.accounts.wallet.load(password);
-    if(my_wallet !== undefined)
-    {
-      $('.successVote').css("display","block");
-      
-      $('.successVote').text("Voting...");
-      
-      var optionBool = option_vote == '1' ? true : false;
-      try {
-        const ans  = await contractPublic.methods.isVotingOn(clubId,proposalId).call();
-
-        console.log("ans",ans)
-       
-        if(!ans){
-          $('.successVote').css("display","none");
-          $('.errorVote').css("display","block");
-          $('.errorVote').text("Voting time periods is over!");
-          toast.error("Voting time periods is over!");
-         
-          return;
-        }
-        
-        const query = contractPublic.methods.voteOnProposal(clubId,proposalId, optionBool);
-        const encodedABI = query.encodeABI();
-
-
-        
-
-        const abi = ABI.abi;
-              const iface = new ethers.utils.Interface(abi);
-              const encodedData = iface.encodeFunctionData("voteOnProposal", [clubId,proposalId, optionBool]);
-              const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
-          
-              const signer = provider.getSigner();
-
-              console.log("singer",signer);
-              const tx = {
-                to: marketplaceAddress,
-                data: encodedData,
-              };
-              const txResponse = await signer.sendTransaction(tx);
-              const txReceipt = await txResponse.wait();
-
-              notification.success({
-                message: 'Transaction Successful',
-                description: (
-                  <div>
-                    Transaction Hash: <a href={`https://testnet.crossvaluescan.com/tx/${txReceipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{txReceipt.transactionHash}</a>
-                  </div>
-                )
-              });
-              console.log(txReceipt.transactionHash);
-       
-      } catch (error) {
-        console.log(error.message);
-        
-      
-        $('.successVote').css("display","none");
-        $('.errorVote').css("display","block");
-        $('.errorVote').text("You already voted on this proposal");
-        return;
-      }
-      
-      $('#option_vote').val('');
-      $('#passwordShowPVVote').val('');
-      $('#errorVote').css("display","none");
-      $('#successVote').css("display","block");
-      $('#successVote').text("Your vote was successful ");
-      window.location.reload();
-    } else {
-      $('.valid-feedback').css('display','none');
-        $('.invalid-feedback').css('display','block');
-        $('.invalid-feedback').text('The password is invalid');
-    }
-    
-  }
-}
-
-
-async function verifyUserInClub() {
-  var clubId = localStorage.getItem("clubId");
-  var filWalletAddress = localStorage.getItem("filWalletAddress");
-  if(clubId != null) {
-    await getContract(filWalletAddress);
-    if(contractPublic != undefined) {
-      var user = await contractPublic.methods.isMemberOfClub(filWalletAddress,clubId).call();
-      if(user) {
-        $('.join_club').css('display','none');
-        $('.leave_club').css('display','block');
-      } else {
-        $('.join_club').css('display','block');
-        $('.leave_club').css('display','none');
-      }
-    }
-  }
-}
 
 function Proposal() {
+
+  const { loading, isLoggedIn,provider,connect, logout, user } = useAuth();
 
   const navigate = useNavigate();
   function Logout(){
@@ -358,6 +58,304 @@ function Proposal() {
     localStorage.clear();
     navigate('/login');
   
+  }
+
+
+  async function runProposal(event) {
+  
+    var filWalletAddress = localStorage.getItem("filWalletAddress");
+    await getContract(filWalletAddress);
+    if(contractPublic != undefined) {
+      var option_execution = $('#option_execution').val()
+      var password = $('#passwordShowPVExecution').val();
+      if(option_execution == '') {
+        $('.errorExecution').css("display","block");
+        $('.errorExecution').text("Option is required");
+        return;
+      }
+      if(password == '') {
+        $('.errorExecution').css("display","block");
+        $('.errorExecution').text("Password is invalid");
+        return;
+      }
+      var clubId = localStorage.getItem("clubId");
+      var proposalId = localStorage.getItem("proposalId");
+      try {
+        const my_wallet = await web3.eth.accounts.wallet.load(password);
+      
+      if(my_wallet !== undefined)
+      {
+        
+  
+        $('.errorExecution').css("display","none");
+        $('.successExecution').css("display","block");
+        $('.successExecution').text("Running...");
+        var clubId = localStorage.getItem("clubId");
+        var proposalId = localStorage.getItem("proposalId");
+        
+          try {
+            const ans  = await contractPublic.methods.isVotingOn(clubId,proposalId).call();
+  
+            if(ans){
+              toast.error("Voting is still ON")
+              $('.successExecution').css("display","none");
+              $('.errorExecution').css("display","block");
+              $('.errorExecution').text("Voting is still ON");
+            }
+            
+            if(option_execution == 'execute') {
+              const query = await contractPublic.methods.executeProposal(clubId,proposalId);
+              const encodedABI = query.encodeABI();
+              
+              
+              try{
+                const abi = ABI.abi;
+                  const iface = new ethers.utils.Interface(abi);
+                  const encodedData = iface.encodeFunctionData("executeProposal", [clubId,proposalId]);
+                  const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
+              
+                  const accounts = await  provider.request({ method: 'eth_accounts' })
+
+
+
+
+
+                const tx = {
+      from: accounts[0], // Adding the 'from' field
+      to: marketplaceAddress,
+      data: encodedData,
+      gas: '2000000', 
+    };
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+              
+                  
+                }catch(error){
+                  console.log(error)
+                }
+  
+             
+            } else {
+              if(option_execution == 'close') {
+                const query = contractPublic.methods.closeProposal(clubId,proposalId);
+                const encodedABI = query.encodeABI();
+                const ans  = await contractPublic.methods.isVotingOn(clubId,proposalId).call();
+  
+                if(ans){
+                  toast.error("Voting is still ON")
+                  $('.successExecution').css("display","none");
+              $('.errorExecution').css("display","block");
+              $('.errorExecution').text("Voting is still ON");
+              return;
+  
+                }
+                
+              try{
+                 
+                  
+                const abi = ABI.abi;
+                  const iface = new ethers.utils.Interface(abi);
+                  const encodedData = iface.encodeFunctionData("closeProposal", [clubId,proposalId]);
+                  const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
+              
+                  const accounts = await  provider.request({ method: 'eth_accounts' })
+
+
+
+
+
+                const tx = {
+      from: accounts[0], // Adding the 'from' field
+      to: marketplaceAddress,
+      data: encodedData,
+      gas: '2000000', 
+    };
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+                }catch(error){
+                  console.log(error)
+                }
+              }
+            }
+            
+          } catch (error) {
+            // alert(error)
+           
+            console.log(error)
+            $('.successExecution').css("display","none");
+            $('.errorExecution').css("display","block");
+            $('.errorExecution').text("Error executing/closing the proposal");
+            return;
+          }
+          
+          $('#option_execution').val('');
+          $('#passwordShowPVExecution').val('');
+          $('.errorExecution').css("display","none");
+          $('.successExecution').css("display","block");
+          $('.successExecution').text("The execution was successful ");
+        } else {
+          // alert(error)
+          toast.error(error)
+          $('.valid-feedback').css('display','none');
+            $('.invalid-feedback').css('display','block');
+            $('.invalid-feedback').text('The password is invalid');
+        }
+      }
+      catch {
+      
+        $('.valid-feedback').css('display','none');
+            $('.invalid-feedback').css('display','block');
+            $('.invalid-feedback').text('The password is invalid');
+      }
+      
+      
+    }
+  }
+  
+  async function verify(){
+    const clubId =  localStorage.getItem("clubId");
+    var proposalId = localStorage.getItem("proposalId");
+    var clubs = await contractPublic.methods.getProposalsByClub(clubId).call();
+    console.log(clubs)
+    const cid= clubs[proposalId-1].Cid;
+  
+    const polygonScanlink = `https://gateway.lighthouse.storage/ipfs/${cid}`
+              toast.success(<a target="_blank" href={polygonScanlink}>Click to view Data</a>, {
+                position: "top-right",
+                autoClose: 18000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+                });
+          
+  
+  }
+  async function voteOnProposal() {
+  
+  
+  
+  
+    var filWalletAddress = localStorage.getItem("filWalletAddress");
+    await getContract(filWalletAddress);
+    
+  
+    var clubId = localStorage.getItem("clubId");
+    var proposalId = localStorage.getItem("proposalId");
+   
+  
+    if(contractPublic != undefined) {
+      var option_vote = $('#option_vote').val()
+      var password = $('#passwordShowPVVote').val();
+      if(option_vote == '') {
+        $('#errorCreateProposal').css("display","block");
+        $('#errorCreateProposal').text("Vote is required");
+        return;
+      }
+      if(password == '') {
+        $('#errorCreateProposal').css("display","block");
+        $('#errorCreateProposal').text("Password is invalid");
+        return;
+      }
+     
+      const my_wallet = await web3.eth.accounts.wallet.load(password);
+      if(my_wallet !== undefined)
+      {
+        $('.successVote').css("display","block");
+        
+        $('.successVote').text("Voting...");
+        
+        var optionBool = option_vote == '1' ? true : false;
+        try {
+          const ans  = await contractPublic.methods.isVotingOn(clubId,proposalId).call();
+  
+          console.log("ans",ans)
+         
+          if(!ans){
+            $('.successVote').css("display","none");
+            $('.errorVote').css("display","block");
+            $('.errorVote').text("Voting time periods is over!");
+            toast.error("Voting time periods is over!");
+           
+            return;
+          }
+          
+          const query = contractPublic.methods.voteOnProposal(clubId,proposalId, optionBool);
+          const encodedABI = query.encodeABI();
+  
+  
+          
+  
+          const abi = ABI.abi;
+                const iface = new ethers.utils.Interface(abi);
+                const encodedData = iface.encodeFunctionData("voteOnProposal", [clubId,proposalId, optionBool]);
+                const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
+            
+                const accounts = await  provider.request({ method: 'eth_accounts' })
+
+
+
+
+
+                const tx = {
+      from: accounts[0], // Adding the 'from' field
+      to: marketplaceAddress,
+      data: encodedData,
+      gas: '2000000', 
+    };
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+         
+        } catch (error) {
+          console.log(error.message);
+          
+        
+          $('.successVote').css("display","none");
+          $('.errorVote').css("display","block");
+          $('.errorVote').text("You already voted on this proposal");
+          return;
+        }
+        
+        $('#option_vote').val('');
+        $('#passwordShowPVVote').val('');
+        $('#errorVote').css("display","none");
+        $('#successVote').css("display","block");
+        $('#successVote').text("Your vote was successful ");
+        window.location.reload();
+      } else {
+        $('.valid-feedback').css('display','none');
+          $('.invalid-feedback').css('display','block');
+          $('.invalid-feedback').text('The password is invalid');
+      }
+      
+    }
+  }
+  
+  
+  async function verifyUserInClub() {
+    var clubId = localStorage.getItem("clubId");
+    var filWalletAddress = localStorage.getItem("filWalletAddress");
+    if(clubId != null) {
+      await getContract(filWalletAddress);
+      if(contractPublic != undefined) {
+        var user = await contractPublic.methods.isMemberOfClub(filWalletAddress,clubId).call();
+        if(user) {
+          $('.join_club').css('display','none');
+          $('.leave_club').css('display','block');
+        } else {
+          $('.join_club').css('display','block');
+          $('.leave_club').css('display','none');
+        }
+      }
+    }
   }
 
 

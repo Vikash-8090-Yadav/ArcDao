@@ -58,8 +58,10 @@ var clubId = localStorage.getItem("clubId");
       $('#votes_for').text(clubs.votesFor);
       $('#votes_against').text(clubs.votesAgainst);
       $('#CID').text(clubs.Cid);
+
+      
    
-      var comp = clubs.creator.toLowerCase()
+      var comp = clubs.creator;
       if(clubs.status == 'Pending' && comp == filWalletAddress) {
 
         $('.creator_options').css('display','block');

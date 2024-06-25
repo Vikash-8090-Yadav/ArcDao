@@ -5,11 +5,12 @@ import Tg from "../components/toggle";
 import $ from 'jquery'; 
 import { useNavigate } from 'react-router-dom';
 import {Web3} from 'web3';
-
+import { useAuth } from "@arcana/auth-react";
 
 const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 
 function JoinClub() {
+  const { loading, isLoggedIn,provider,connect, logout, user } = useAuth();
   const navigate = useNavigate();
   function Logout(){
     web3.eth.accounts.wallet.clear();

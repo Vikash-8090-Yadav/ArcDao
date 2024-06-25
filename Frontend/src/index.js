@@ -26,7 +26,7 @@ ReactDOM.render(
     <React.StrictMode>
       <ProvideAuth provider={provider}>
       <Nav provider={provider}/>
-    </ProvideAuth>
+
       <BrowserRouter>
         <Routes>
           <Route path="*" element={ <App /> }>
@@ -35,6 +35,7 @@ ReactDOM.render(
       </BrowserRouter>
 
       <ToastContainer/>
+      </ProvideAuth>
     </React.StrictMode>,
     
     document.getElementById('root')

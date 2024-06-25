@@ -37,10 +37,24 @@ function Nav() {
 
 
 
-  const { loading, isLoggedIn, provider,connect, user } = useAuth();
+  const { loading, isLoggedIn,provider,connect, logout, user } = useAuth();
+
+
+  console.log("The login is ",isLoggedIn);
 
   console.log("The provider is",provider);
 
+
+  if(user){
+  
+    const add = user.address;
+
+    console.log("The adress under useeffectr is ",add);
+    localStorage.setItem("filWalletAddress",add) 
+
+
+    console.log(user);
+  }
  
 
 
@@ -91,7 +105,35 @@ function Nav() {
 
 
   
-  async function logout(){
+  async function logout1(){
+
+
+    const typedData = {
+      types: {
+        EIP712Domain: [
+          { name: 'name', type: 'string' },
+          { name: 'version', type: 'string' },
+          { name: 'chainId', type: 'uint256' },
+          { name: 'verifyingContract', type: 'address' }
+        ],
+        Message: [
+          { name: 'message', type: 'string' }
+        ]
+      },
+      primaryType: 'Message',
+      domain: {
+        name: 'Example DApp',
+        version: '1.0',
+        chainId: 84532,
+        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
+      },
+      message: {
+        message: 'This is  ArcDao'
+      }
+    };
+
+     
+
     alert("Logout")
     const accounts = await  provider.request({ method: 'eth_accounts' })
 
@@ -113,11 +155,11 @@ function Nav() {
       console.log(provider);
   
       const sig = await provider.request({
-        method: 'eth_sign',
-        params: [accounts[0],'Thhiiss'],
+        method: 'eth_signTypedData_v4',
+        params: [accounts[0], JSON.stringify(typedData)],
       });
       
-      console.log({ sig });
+      // console.log({ sig });
     } catch (error) {
       console.error('Error signing message:', error);
     }
@@ -150,7 +192,7 @@ function Nav() {
   
   }, []);
 
-  console.log(accountAddress)
+  // console.log(accountAddress)
 
 
 
@@ -219,7 +261,7 @@ function Nav() {
                   </form>
                 </div>
               </li>
-              {accountAddress !== null && !isOpen && (
+              {accountAddress !== null && isLoggedIn && (
               <>
               <div className=' name flex'>
               {accountAddress}
@@ -230,44 +272,21 @@ function Nav() {
               <div className="topbar-divider d-none d-sm-block" />
               {/* Nav Item - User Information */}
               
-              {accountAddress !== null && !isOpen && (
-            <>
               
-              <li className="nav-item dropdown no-arrow">
-                <div
-                  className="nav-link dropdown-toggle"
-                  onClick={() => setIsOpen(true)}
-                  id="userDropdown"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  <img
-
-                    className="img-profile rounded-circle"
-                    src="img/undraw_profile.svg"
-                  />
-                </div>
-                {/* Dropdown - User Information */}
-
-              </li>
-              </>
-              )}
             </ul>
    
             <div className='maincomp flex'>
-          {accountAddress && isOpen && (
+          {accountAddress && isLoggedIn && (
             <SideMenu
               address={accountAddress}
-              isOpen={isOpen}
+              isOpen={false}
               setIsOpen={setIsOpen}
               accountAddress={accountAddress}
-              logout={logout}
+              logout={logout1}
               userInfo={accountAddress}
             />
           )}
-          {accountAddress == null && !loading1 && (
+          { !isLoggedIn && (
             
             <button onClick={() => onConnectClick()}  class=" font-semibold bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">LOGIN</button>
             

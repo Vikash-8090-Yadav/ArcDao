@@ -13,6 +13,10 @@ import GetClub from "../getclub";
 import GetProposals from "../getProposals";
 import axios from 'axios';
 import Tg from "../components/toggle";
+
+import { useAuth } from "@arcana/auth-react";
+
+
 const ethers = require("ethers")
 const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.base.org"));
 var contractPublic = null;
@@ -27,230 +31,221 @@ async function getContract(userAddress) {
   }
 
 
-
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-async function contributeClub() {
- 
-  toast.info('Contribution intiated ...', {
-    position: "top-right",
-    autoClose: 15000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "dark",
-    });
-  var walletAddress = localStorage.getItem("filWalletAddress");
-  // alert(walletAddress) /// /////
-  await getContract(walletAddress);
-  $('.successContributeClub').css('display','none');
-  $('.errorContributeClub').css('display','none');
-  var clubId = localStorage.getItem("clubId");
-  var amountAE = $('#aeAmount').val();
-  // alert(amountAE)
-  var password = $('#passwordShowPVContribute').val();
-  if(amountAE == '' || amountAE <= 0) {
-    $('.successContributeClub').css('display','none');
-    $('.errorContributeClub').css("display","block");
-    $('.errorContributeClub').text("Amount must be more than 0.");
-    return;
-  }
-  if(password == '') {
-    $('.successContributeClub').css('display','none');
-    $('.errorContributeClub').css("display","block");
-    $('.errorContributeClub').text("Password is invalid");
-    return;
-  }
-  // var my_wallet = web3.eth.accounts.wallet.load(password)[0];
-  const my_wallet = await web3.eth.accounts.wallet.load(password);
- 
-  
-  if(my_wallet !== undefined)
-  {
-    if(clubId != null) {
-      $('.successContributeClub').css("display","block");
-      $('.successContributeClub').text("Contributing to the club...");
-      
-      if(contractPublic != undefined) {
-        amountAE  = web3.utils.toWei(amountAE.toString(), 'ether');
-
-        
-        // alert(amountAE)
-        //await contractPublic.$call('contributeToClub', [clubId])
-        try {
-          // alert("Yes");
-          const query = contractPublic.methods.contributeToClub(clubId);
-          const encodedABI = query.encodeABI();
-          const accounts1 = web3.eth.accounts;
-          
-
-
-            if (web3 && web3.eth) {
-              try {
-                const abi = ABI.abi;
-                    const iface = new ethers.utils.Interface(abi);
-                    const encodedData = iface.encodeFunctionData("contributeToClub", [clubId]);
-                    const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
-                
-                    
-                    const signer = provider.getSigner();
-
-              console.log("singer",signer);
-              const tx = {
-                to: marketplaceAddress,
-                data: encodedData,
-                value: amountAE,
-
-              };
-              const txResponse = await signer.sendTransaction(tx);
-              const txReceipt = await txResponse.wait();
-
-              notification.success({
-                message: 'Transaction Successful',
-                description: (
-                  <div>
-                    Transaction Hash: <a href={`https://testnet.crossvaluescan.com/tx/${txReceipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{txReceipt.transactionHash}</a>
-                  </div>
-                )
-              });
-
-              console.log(txReceipt.transactionHash);
-                
-              } catch (error) {
-
-          toast.error(error);
-                console.error('Error sending signed transaction:', error);
-              }
-            } else {
-
-          toast.error(error);
-              console.error('web3 instance is not properly initialized.');
-            }
-          // var clubId = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-          console.log('Transaction Receipt:', clubId);
-          
-        } catch(e) {
-          console.log(e);
-          toast.error(e);
-          $('.successContributeClub').css('display','none');
-          $('.errorContributeClub').css("display","block");
-          $('.errorContributeClub').text(e.toString());
-          return;
-        }
-        
-        
-      }
-    }
-    $('.errorContributeClub').css('display','none');
-    $('.successContributeClub').css("display","block");
-    $('.successContributeClub').text("You have contributed to the club successfully");
-  } else {
-    $('.successContributeClub').css('display','none');
-    $('.errorContributeClub').css("display","block");
-    $('.errorContributeClub').text("Password is invalid");
-    return;
-  }
-  
-
-}
-
-async function leaveClub() {
-  $('.successJoinLeaveClub').css('display','none');
-  $('.errorJoinLeaveClub').css('display','none');
-  var clubId = localStorage.getItem("clubId");
-  var password = $('#passwordShowPVLeave').val();
-  if(password == '') {
-    $('.successJoinLeaveClub').css('display','none');
-    $('.errorJoinLeaveClub').css("display","block");
-    $('.errorJoinLeaveClub').text("Password is invalid");
-    return;
-  }
-  const my_wallet = await web3.eth.accounts.wallet.load(password);
-  if(my_wallet !== undefined)
-  {
-    
-    if(clubId != null) {
-      $('.successJoinLeaveClub').css("display","block");
-      $('.successJoinLeaveClub').text("Leaving the club...");
-      await getContract();
-      if(contractPublic != undefined) {
-        
-        const query = contractPublic.methods.leaveClub(clubId);
-        const encodedABI = query.encodeABI();
-
-        try{
-          const abi = ABI.abi;
-            const iface = new ethers.utils.Interface(abi);
-            const encodedData = iface.encodeFunctionData("leaveClub", [clubId]);
-            const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
-        
-            const signer = provider.getSigner();
-
-              console.log("singer",signer);
-              const tx = {
-                to: marketplaceAddress,
-                data: encodedData,
-              };
-              const txResponse = await signer.sendTransaction(tx);
-              const txReceipt = await txResponse.wait();
-
-              notification.success({
-                message: 'Transaction Successful',
-                description: (
-                  <div>
-                    Transaction Hash: <a href={`https://testnet.crossvaluescan.com/tx/${txReceipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{txReceipt.transactionHash}</a>
-                  </div>
-                )
-              });
-
-              console.log(txReceipt.transactionHash);
-          }catch(error){
-            console.log(error)
-          }
-
-        }
-      }
-    $('.errorJoinLeaveClub').css('display','none');
-    $('.successJoinLeaveClub').css("display","block");
-    $('.successJoinLeaveClub').text("You have left the club successfully");
-  } else {
-    $('.successJoinLeaveClub').css('display','none');
-    $('.errorJoinLeaveClub').css("display","block");
-    $('.errorJoinLeaveClub').text("Password is invalid");
-    return;
-  }
-}
-
-
-
-async function verifyUserInClub() {
-  var clubId = localStorage.getItem("clubId");
-  var filWalletAddress = localStorage.getItem("filWalletAddress");
-  if(clubId != null) {
-    await getContract();
-    if(contractPublic != undefined) {
-      var user = await contractPublic.methods.isMemberOfClub(filWalletAddress,clubId).call();
-      if(user) {
-        $('.join_club').css('display','none');
-        $('.leave_club').css('display','block');
-      } else {
-        $('.join_club').css('display','block');
-        $('.leave_club').css('display','none');
-      }
-    }
-  }
-}
-
-
-
 function Club() {
 
   // getdealId();
-
+  const { loading, isLoggedIn,provider,connect, logout, user } = useAuth();
   
   const [password, setPassword] = useState('');
+
+
+  async function contributeClub() {
+ 
+    toast.info('Contribution intiated ...', {
+      position: "top-right",
+      autoClose: 15000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      });
+    var walletAddress = localStorage.getItem("filWalletAddress");
+    // alert(walletAddress) /// /////
+    await getContract(walletAddress);
+    $('.successContributeClub').css('display','none');
+    $('.errorContributeClub').css('display','none');
+    var clubId = localStorage.getItem("clubId");
+    var amountAE = $('#aeAmount').val();
+    // alert(amountAE)
+    var password = $('#passwordShowPVContribute').val();
+    if(amountAE == '' || amountAE <= 0) {
+      $('.successContributeClub').css('display','none');
+      $('.errorContributeClub').css("display","block");
+      $('.errorContributeClub').text("Amount must be more than 0.");
+      return;
+    }
+    if(password == '') {
+      $('.successContributeClub').css('display','none');
+      $('.errorContributeClub').css("display","block");
+      $('.errorContributeClub').text("Password is invalid");
+      return;
+    }
+    // var my_wallet = web3.eth.accounts.wallet.load(password)[0];
+    const my_wallet = await web3.eth.accounts.wallet.load(password);
+   
+    
+    if(my_wallet !== undefined)
+    {
+      if(clubId != null) {
+        $('.successContributeClub').css("display","block");
+        $('.successContributeClub').text("Contributing to the club...");
+        
+        if(contractPublic != undefined) {
+          amountAE  = web3.utils.toWei(amountAE.toString(), 'ether');
+  
+          
+          // alert(amountAE)
+          //await contractPublic.$call('contributeToClub', [clubId])
+          try {
+            // alert("Yes");
+            const query = contractPublic.methods.contributeToClub(clubId);
+            const encodedABI = query.encodeABI();
+            const accounts1 = web3.eth.accounts;
+            
+  
+  
+              if (web3 && web3.eth) {
+                try {
+                  const abi = ABI.abi;
+                      const iface = new ethers.utils.Interface(abi);
+                      const encodedData = iface.encodeFunctionData("contributeToClub", [clubId]);
+                      const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
+                  
+                      
+                      const accounts = await  provider.request({ method: 'eth_accounts' })
+
+
+
+
+
+                const tx = {
+      from: accounts[0], // Adding the 'from' field
+      to: marketplaceAddress,
+      data: encodedData,
+      gas: '2000000', 
+      value:amountAE,
+    };
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+                  
+                } catch (error) {
+  
+            toast.error(error);
+                  console.error('Error sending signed transaction:', error);
+                }
+              } else {
+  
+            toast.error(error);
+                console.error('web3 instance is not properly initialized.');
+              }
+            // var clubId = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+            console.log('Transaction Receipt:', clubId);
+            
+          } catch(e) {
+            console.log(e);
+            toast.error(e);
+            $('.successContributeClub').css('display','none');
+            $('.errorContributeClub').css("display","block");
+            $('.errorContributeClub').text(e.toString());
+            return;
+          }
+          
+          
+        }
+      }
+      $('.errorContributeClub').css('display','none');
+      $('.successContributeClub').css("display","block");
+      $('.successContributeClub').text("You have contributed to the club successfully");
+    } else {
+      $('.successContributeClub').css('display','none');
+      $('.errorContributeClub').css("display","block");
+      $('.errorContributeClub').text("Password is invalid");
+      return;
+    }
+    
+  
+  }
+  
+  async function leaveClub() {
+    $('.successJoinLeaveClub').css('display','none');
+    $('.errorJoinLeaveClub').css('display','none');
+    var clubId = localStorage.getItem("clubId");
+    var password = $('#passwordShowPVLeave').val();
+    if(password == '') {
+      $('.successJoinLeaveClub').css('display','none');
+      $('.errorJoinLeaveClub').css("display","block");
+      $('.errorJoinLeaveClub').text("Password is invalid");
+      return;
+    }
+    const my_wallet = await web3.eth.accounts.wallet.load(password);
+    if(my_wallet !== undefined)
+    {
+      
+      if(clubId != null) {
+        $('.successJoinLeaveClub').css("display","block");
+        $('.successJoinLeaveClub').text("Leaving the club...");
+        await getContract();
+        if(contractPublic != undefined) {
+          
+          const query = contractPublic.methods.leaveClub(clubId);
+          const encodedABI = query.encodeABI();
+  
+          try{
+            const abi = ABI.abi;
+              const iface = new ethers.utils.Interface(abi);
+              const encodedData = iface.encodeFunctionData("leaveClub", [clubId]);
+              const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
+          
+              const accounts = await  provider.request({ method: 'eth_accounts' })
+
+
+
+
+
+                const tx = {
+      from: accounts[0], // Adding the 'from' field
+      to: marketplaceAddress,
+      data: encodedData,
+      gas: '2000000', 
+    };
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
+            }catch(error){
+              console.log(error)
+            }
+  
+          }
+        }
+      $('.errorJoinLeaveClub').css('display','none');
+      $('.successJoinLeaveClub').css("display","block");
+      $('.successJoinLeaveClub').text("You have left the club successfully");
+    } else {
+      $('.successJoinLeaveClub').css('display','none');
+      $('.errorJoinLeaveClub').css("display","block");
+      $('.errorJoinLeaveClub').text("Password is invalid");
+      return;
+    }
+  }
+  
+  
+  
+  async function verifyUserInClub() {
+    var clubId = localStorage.getItem("clubId");
+    var filWalletAddress = localStorage.getItem("filWalletAddress");
+    if(clubId != null) {
+      await getContract();
+      if(contractPublic != undefined) {
+        var user = await contractPublic.methods.isMemberOfClub(filWalletAddress,clubId).call();
+        if(user) {
+          $('.join_club').css('display','none');
+          $('.leave_club').css('display','block');
+        } else {
+          $('.join_club').css('display','block');
+          $('.leave_club').css('display','none');
+        }
+      }
+    }
+  }
+
+  
+
+
 
 
   async function joinClub() {
@@ -287,26 +282,22 @@ function Club() {
               const encodedData = iface.encodeFunctionData("joinClub", [clubId]);
               const GAS_MANAGER_POLICY_ID = "479c3127-fb07-4cc6-abce-d73a447d2c01";
           
-              const signer = provider.getSigner();
+              const accounts = await  provider.request({ method: 'eth_accounts' })
 
-              console.log("singer",signer);
-              const tx = {
-                to: marketplaceAddress,
-                data: encodedData,
-              };
-              const txResponse = await signer.sendTransaction(tx);
-              const txReceipt = await txResponse.wait();
 
-              notification.success({
-                message: 'Transaction Successful',
-                description: (
-                  <div>
-                    Transaction Hash: <a href={`https://testnet.crossvaluescan.com/tx/${txReceipt.transactionHash}`} target="_blank" rel="noopener noreferrer">{txReceipt.transactionHash}</a>
-                  </div>
-                )
-              });
 
-              console.log(txReceipt.transactionHash);
+
+
+                const tx = {
+      from: accounts[0], // Adding the 'from' field
+      to: marketplaceAddress,
+      data: encodedData,
+      gas: '2000000',
+    };
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [tx],
+    });
               } catch (error) {
                 console.error('Error sending signed transaction:', error);
               }
