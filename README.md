@@ -1,9 +1,10 @@
-![Screenshot from 2024-05-27 11-45-34](https://github.com/Vikash-8090-Yadav/TreasureDao/assets/85225156/931029a7-1c61-4a6a-8fb2-78b93e4ee1b3)
+![image](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/565652c2-7ffd-49ed-bb67-8695228a6664)![Screenshot from 2024-06-26 05-49-17](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/f0492a1f-fade-4c18-8913-b5d7685c327e)
 
 
-## This dapp is live : https://treasure-dao-kappa.vercel.app/
 
-## Demo Video:  
+## This dapp is live :https://arc-dao.vercel.app/
+
+## Demo Video:  https://youtu.be/ImXcE-UEySo?si=vztxMtqD1EH_4hKX
 
 
 # Smart contract  -  0xEf75f5dcaA00c6247CA19d06f2DDCC3D73DC5Ef2
@@ -105,7 +106,7 @@ The club smart contract has some restrictions, similar to real hedge funds:
 
 
 
-## What Next for TreasureDao ?
+## What Next for Arc Dao ?
 
 - ChainLink function (Twitter) -> I can use twitter function  to check the  latest post wether that person is fake or real
 -  Ai for recommendation on user interest 
@@ -138,7 +139,7 @@ The club smart contract has some restrictions, similar to real hedge funds:
 
 ## 🚀 Setting up the project locally
 
-To run the  TreasureDao locally, follow these steps:
+To run the  ArcDao locally, follow these steps:
 1. Clone the repository:
  ```bash
 https://github.com/Vikash-8090-Yadav/ArcDao.git
