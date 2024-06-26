@@ -35,7 +35,7 @@ Arc Dao allows you to manage investment clubs, and to spread access to participa
 ![Screenshot from 2024-06-26 05-33-39](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/b1714714-bf73-4117-b2a6-12b09fe6ce63)
 
 
-## Code for the authentication can be found here: https://github.com/Vikash-8090-Yadav/ArcDao/blob/main/Frontend/src/components/nav.jsx
+## Code for the authentication can be found here: https://github.com/Vikash-8090-Yadav/ArcDao/blob/main/Frontend/src/index.js#L11
 
 # Features of Arc Dao
 
