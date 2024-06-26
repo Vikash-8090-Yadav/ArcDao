@@ -1,4 +1,4 @@
-![image](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/565652c2-7ffd-49ed-bb67-8695228a6664)![Screenshot from 2024-06-26 05-49-17](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/f0492a1f-fade-4c18-8913-b5d7685c327e)
+![image](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/565652c2-7ffd-49ed-bb67-8695228a6664)
 
 
 
@@ -35,13 +35,7 @@ Arc Dao allows you to manage investment clubs, and to spread access to participa
 ![Screenshot from 2024-06-26 05-33-39](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/b1714714-bf73-4117-b2a6-12b09fe6ce63)
 
 
-## The Arcana Wallet  
-
-
-![Screenshot from 2024-06-26 05-33-39](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/367f0494-76b2-4e9b-a4df-684506b01bb9)
-
-
-Code for the authentication can be found here: https://github.com/Vikash-8090-Yadav/ArcDao/blob/main/Frontend/src/components/nav.jsx
+## Code for the authentication can be found here: https://github.com/Vikash-8090-Yadav/ArcDao/blob/main/Frontend/src/components/nav.jsx
 
 # Features of Arc Dao
 
