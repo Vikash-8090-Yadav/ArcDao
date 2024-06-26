@@ -96,7 +96,7 @@ The club smart contract has some restrictions, similar to real hedge funds:
 
 ## Below is the images of all error 
 
-![Screenshot from 2024-06-25 13-37-27](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/0db9c63a-242b-45ab-b2ae-bdbc49200d48)
+![Screenshot from 2024-06-26 05-53-25](https://github.com/Vikash-8090-Yadav/ArcDao/assets/85225156/80e6ee11-c645-4e45-8f92-f74846541531)
 
 
 
